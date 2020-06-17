@@ -189,10 +189,15 @@ end
 -- 	end
 -- end )
 
-function ExecutionerPunishment(ply)
-	timer.Simple(GetConVar("ttt2_executioner_punishment_time"):GetInt(), function() brokeContract = false end)
+function RepairContract(ply)
+	brokeContract = false
 	SelectNewTarget(ply)
 end
+
+function ExecutionerPunishment(ply)
+	timer.Create("ExecutionerPunishment", GetConVar("ttt2_executioner_punishment_time"):GetInt(), 0, function() RepairContract(ply)	end)
+end
+
 hook.Add("TTT2PunishExecutioner", "Punishment", ExecutionerPunishment)
 
 concommand.Add("ttt2_print_exc_target", PrintTarget)
