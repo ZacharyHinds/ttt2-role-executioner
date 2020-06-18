@@ -14,4 +14,4 @@ The Executioner is just able to collect some credits if he kills his target.]]
 L["ttt2_executioner_target_killed"] = "You've killed your target!"
 L["ttt2_executioner_chat_reveal"] = "'{playername}' is a Executioner!"
 L["ttt2_executioner_target_died"] = "Your target died..."
-L["ttt2_executioner_target_killed_wrong"] = "You killed the wrong target! You'll get a new contract in "..GetConVar("ttt2_executioner_punishment_time"):GetInt().." seconds!"
+L["ttt2_executioner_target_killed_wrong"] = "You killed the wrong target! You'll get a new contract after some time!"

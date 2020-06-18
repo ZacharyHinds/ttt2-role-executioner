@@ -68,7 +68,15 @@ local function ExecutionerTargetDied(ply)
 			SelectNewTarget(attacker)
 			-- end
 		else
-			LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", nil, MSG_MSTACK_ROLE)
+			if GetConVar("ttt2_executioner_punishment_time"):GetInt() > 0 then
+				LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", nil, MSG_MSTACK_ROLE)
+				ply:SetTargetPlayer(nil)
+				brokeContract = true
+				SelectNewTarget(attacker)
+				hook.Run("TTT2PunishExecutioner", attacker)
+			else
+				SelectNewTarget(attacker)
+			end
 			ply:SetTargetPlayer(nil)
 			brokeContract = true
 			SelectNewTarget(attacker)
