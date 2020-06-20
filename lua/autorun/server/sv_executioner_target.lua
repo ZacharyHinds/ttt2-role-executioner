@@ -4,14 +4,15 @@ brokeContract = false
 local function GetTargets(ply)
 	local targets = {}
 	local detes = {}
+	local spies = {}
 
 	if not IsValid(ply) or not ply:IsActive() or not ply:Alive() or ply.IsGhost and ply:IsGhost() or ply:GetSubRole() ~= ROLE_EXECUTIONER then
 		return targets
 	end
 
 	for _, pl in ipairs(player.GetAll()) do
-		if pl:Alive() and pl:IsActive() and not pl:IsInTeam(ply) and (not pl.IsGhost or not pl:IsGhost()) and (not JESTER or not pl:IsRole(ROLE_JESTER)) then
-			if pl:IsRole(ROLE_DETECTIVE) then
+		if pl:Alive() and pl:IsActive() and not pl:IsInTeam(ply) and (not pl.IsGhost or not pl:IsGhost()) and (not JESTER or not pl:IsRole(ROLE_JESTER) or pl:GetSubRole() == ROLE_SPY or ply:GetTeam() == pl:GetTeam()) then
+			if pl:IsRole(ROLE_DETECTIVE) or pl:GetSubRole() == ROLE_SPY then
 				detes[#detes + 1] = pl
 			else
 				targets[#targets + 1] = pl
@@ -20,6 +21,9 @@ local function GetTargets(ply)
 	end
 
 	if #targets < 1 then
+		if detes < 1 then
+			detes = spies
+		end
 		targets = detes
 	end
 
@@ -57,13 +61,6 @@ local function ExecutionerTargetDied(ply)
 
 	if IsValid(attacker) and attacker:GetSubRole() == ROLE_EXECUTIONER and (not attacker.IsGhost or not attacker:IsGhost()) and attacker:GetTargetPlayer() then
 		if attacker:GetTargetPlayer() == ply then -- if attacker's target is the dead player
-			-- local val = GetConVar("ttt2_hitman_target_credit_bonus"):GetInt()
-			--
-			-- if val > 0 and attacker:IsActive() then
-			-- 	attacker:AddCredits(val)
-			--
-			-- 	LANG.Msg(attacker, "ttt2_hitman_target_killed_credits", {amount = val}, MSG_MSTACK_ROLE)
-			-- else
 			LANG.Msg(attacker, "ttt2_executioner_target_killed", nil, MSG_MSTACK_ROLE)
 			SelectNewTarget(attacker)
 			-- end
@@ -81,16 +78,15 @@ local function ExecutionerTargetDied(ply)
 			brokeContract = true
 			SelectNewTarget(attacker)
 			hook.Run("TTT2PunishExecutioner", attacker)
-		-- elseif GetConVar("ttt2_hitman_target_chatreveal"):GetBool() and attacker ~= ply then -- Reveal Hitman
-		-- 	LANG.MsgAll("ttt2_hitman_chat_reveal", {playername = attacker:Nick()}, MSG_MSTACK_WARN)
+
 		end
 	end
 	for _, pl in ipairs(player.GetAll()) do
 		local target = pl:GetTargetPlayer()
 
-		if (not IsValid(attacker) or pl ~= attacker) and (not pl.IsGhost or not pl:IsGhost()) and target == ply and pl:GetSubRole() == ROLE_EXECUTIONER then
+		if (not IsValid(attacker) or pl ~= attacker) and (not pl.IsGhost or not pl:IsGhost()) and target == ply and pl:GetSubRole() == ROLE_EXECUTIONER and not brokeContract then
 			LANG.Msg(pl, "ttt2_executioner_target_died", nil, MSG_MSTACK_PLAIN)
-
+			SelectNewTarget(pl)
 			--SelectNewTarget(pl)
 		end
 	end
