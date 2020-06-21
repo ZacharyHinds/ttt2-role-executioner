@@ -21,7 +21,7 @@ local function GetTargets(ply)
 	end
 
 	if #targets < 1 then
-		if detes < 1 then
+		if #detes < 1 then
 			detes = spies
 		end
 		targets = detes
@@ -66,7 +66,7 @@ local function ExecutionerTargetDied(ply)
 			-- end
 		else
 			if GetConVar("ttt2_executioner_punishment_time"):GetInt() > 0 then
-				LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", nil, MSG_MSTACK_ROLE)
+				LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", {punishtime = punishment_delay}, MSG_MSTACK_ROLE)
 				ply:SetTargetPlayer(nil)
 				brokeContract = true
 				SelectNewTarget(attacker)
@@ -199,7 +199,11 @@ function RepairContract(ply)
 end
 
 function ExecutionerPunishment(ply)
-	timer.Create("ExecutionerPunishment", GetConVar("ttt2_executioner_punishment_time"):GetInt(), 0, function() RepairContract(ply)	end)
+	timer.Create("ExecutionerPunishment", GetConVar("ttt2_executioner_punishment_time"):GetInt(), 0, function()
+		if brokeContract then
+			RepairContract(ply)
+		end
+	end)
 end
 
 hook.Add("TTT2PunishExecutioner", "Punishment", ExecutionerPunishment)
