@@ -156,14 +156,14 @@ local function ExecutionerTargetHit(ply, dmginfo)
 
 	local attacker = dmginfo:GetAttacker()
 
-	if not attacker or not IsValid(attacker) or not attacker:IsPlayer() or not attacker:GetSubRole() == ROLE_EXECUTIONER then return end
+	if not attacker or not IsValid(attacker) or not attacker:IsPlayer() or attacker:GetSubRole() ~= ROLE_EXECUTIONER then return end
 
 	local damage_multiplier = GetConVar("ttt2_executioner_target_multiplier"):GetFloat()
 	local damage_divisor = GetConVar("ttt2_executioner_non_target_multiplier"):GetFloat()
 
-	if ply == attacker:GetTargetPlayer() then
+	if ply == attacker:GetTargetPlayer() and attacker:GetSubRole() == ROLE_EXECUTIONER then
 		dmginfo:ScaleDamage(damage_multiplier)
-	elseif ply ~= attacker:GetTargetPlayer() then
+	elseif ply ~= attacker:GetTargetPlayer() and attacker:GetSubRole() == ROLE_EXECUTIONER then
 		dmginfo:ScaleDamage(damage_divisor)
 	end
 end
