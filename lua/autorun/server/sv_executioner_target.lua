@@ -163,7 +163,7 @@ local function ExecutionerTargetHit(ply, dmginfo)
 
 	if ply == attacker:GetTargetPlayer() and attacker:GetSubRole() == ROLE_EXECUTIONER then
 		dmginfo:ScaleDamage(damage_multiplier)
-	elseif ply ~= attacker:GetTargetPlayer() and attacker:GetSubRole() == ROLE_EXECUTIONER then
+	elseif ply ~= attacker:GetTargetPlayer() and attacker:GetSubRole() == ROLE_EXECUTIONER and ply:AccountID() ~= attacker:AccountID() then
 		dmginfo:ScaleDamage(damage_divisor)
 	end
 end
