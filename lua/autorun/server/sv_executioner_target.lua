@@ -56,7 +56,7 @@ end
 hook.Add("TTT2PostPlayerDeath", "ExecutionerTargetChanged", ExecutionerTargetChanged)
 
 local function ExecutionerTargetDied(ply, _, attacker)
-	if not attacker then attacker = ply.targetAttacker
+	if not attacker then attacker = ply.targetAttacker end
 	local punishment_delay = GetConVar("ttt2_executioner_punishment_time"):GetInt()
 
 	if IsValid(attacker) and attacker:GetSubRole() == ROLE_EXECUTIONER and (not attacker.IsGhost or not attacker:IsGhost()) and attacker:GetTargetPlayer() then
