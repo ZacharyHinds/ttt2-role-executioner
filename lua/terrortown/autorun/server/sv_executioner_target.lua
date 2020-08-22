@@ -40,9 +40,9 @@ local function SelectNewTarget(ply)
   end
   local tgt = ply:GetTargetPlayer()
   if tgt then
-    print(ply:Nick().."'s target is '"..tgt:Nick())
+    -- print(ply:Nick().."'s target is '"..tgt:Nick())
   else
-    print("No Target")
+    -- print("No Target")
   end
 end
 
