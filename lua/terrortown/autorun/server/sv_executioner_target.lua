@@ -38,12 +38,12 @@ local function SelectNewTarget(ply)
   else
     ply:SetTargetPlayer(nil)
   end
-  local tgt = ply:GetTargetPlayer()
-  if tgt then
-    -- print(ply:Nick().."'s target is '"..tgt:Nick())
-  else
-    -- print("No Target")
-  end
+  -- local tgt = ply:GetTargetPlayer()
+  -- if tgt then
+  --   -- print(ply:Nick().."'s target is '"..tgt:Nick())
+  -- else
+  --   -- print("No Target")
+  -- end
 end
 
 local function ExecutionerTargetChanged(ply, _, attacker)
@@ -140,6 +140,19 @@ local function ExecutionerTargetRoleChanged(ply, old, new)
   end
 end
 hook.Add("TTT2UpdateSubrole", "ExecutionerTargetRoleChanged", ExecutionerTargetRoleChanged)
+
+local function ExecutionerTargetBaseRoleChange(ply, old, new)
+  if new ~= ROLE_DETECTIVE then return end
+
+  local GetPlayers = player.GetAll()
+  for i = 1, #GetPlayers do
+    local pl = GetPlayers[i]
+    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply then
+      SelectNewTarget(pl)
+    end
+  end
+end
+hook.Add("TTT2UpdateBaserole", "ExecutionerTargetBaseRoleChange", ExecutionerTargetBaseRoleChange)
 
 local function ExecutionerGotSelected()
   for _, ply in ipairs(player.GetAll()) do
