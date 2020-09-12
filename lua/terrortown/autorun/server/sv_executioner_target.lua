@@ -154,6 +154,19 @@ local function ExecutionerTargetBaseRoleChange(ply, old, new)
 end
 hook.Add("TTT2UpdateBaserole", "ExecutionerTargetBaseRoleChange", ExecutionerTargetBaseRoleChange)
 
+local function ExecutionerTargetTeamChange(ply, old, new)
+  if new ~= TEAM_TRAITOR then return end
+
+  local plys = player.GetAll()
+  for i = 1, #plys do
+    local pl = plys[i]
+    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply then
+      SelectNewTarget(pl)
+    end
+  end
+end
+hook.Add("TTT2UpdateTeam", "ExecutionerTargetTeamChange", ExecutionerTargetTeamChange)
+
 local function ExecutionerGotSelected()
   for _, ply in ipairs(player.GetAll()) do
     if ply:GetSubRole() == ROLE_EXECUTIONER then
