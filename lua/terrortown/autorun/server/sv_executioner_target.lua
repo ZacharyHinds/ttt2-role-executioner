@@ -11,7 +11,7 @@ local function GetTargets(ply)
   end
 
   for _, pl in ipairs(player.GetAll()) do
-    if pl:Alive() and pl:IsActive() and not pl:IsInTeam(ply) and (not pl.IsGhost or not pl:IsGhost()) and (not JESTER or not pl:IsRole(ROLE_JESTER) or pl:GetSubRole() == ROLE_SPY or ply:GetTeam() == pl:GetTeam()) then
+    if pl:Alive() and pl:IsActive() and not (pl:IsInTeam(ply) or pl:HasTeam(TEAM_NONE)) and (not pl.IsGhost or not pl:IsGhost()) and (not JESTER or not pl:IsRole(ROLE_JESTER) or pl:GetSubRole() == ROLE_SPY or ply:GetTeam() == pl:GetTeam()) then
       if pl:GetSubRole() == ROLE_MEDIC then continue end
       if pl:IsRole(ROLE_DETECTIVE) or pl:GetSubRole() == ROLE_SPY then
         detes[#detes + 1] = pl
