@@ -32,3 +32,17 @@ hook.Add("TTTRenderEntityInfo", "ttt2_executioner_target_highlight", function(tD
     )
   end
 end)
+
+hook.Add("Initialize", "ttt2_exe_broke_contract", function()
+  STATUS:RegisterStatus("ttt2_exe_broke_contract", {
+    hud = targetExe,
+    type = "bad"
+  })
+end)
+
+net.Receive("ttt2_exe_broke_contract", function()
+  local client = LocalPlayer()
+  if client:GetSubRole() ~= ROLE_EXECUTIONER then return end
+  local time = net.ReadInt(32)
+  STATUS:AddTimedStatus("ttt2_exe_broke_contract", time, true)
+end)
