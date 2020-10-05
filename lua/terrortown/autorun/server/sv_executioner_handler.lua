@@ -172,7 +172,7 @@ end
 hook.Add("TTT2UpdateTeam", "ExecutionerTargetTeamChange", ExecutionerTargetTeamChange)
 
 local function ExecutionerGotSelected()
-  timer.Simple(0.1, function()
+  timer.Simple(0.5, function()
     local plys = player.GetAll()
     for i = 1, #plys do
       local ply = plys[i]
@@ -194,6 +194,12 @@ local function ExecutionerDealDamage(ply, dmginfo)
 
   local dmg_mult = GetConVar("ttt2_executioner_target_multiplier"):GetFloat()
   local dmg_div = GetConVar("ttt2_executioner_non_target_multiplier"):GetFloat()
+  local atk_tgt = attacker:GetTargetPlayer()
+  if not IsValid(atk_tgt) or not atk_tgt:Alive() or atk_tgt:IsSpec() then
+    NewTarget(attacker)
+  end
+  atk_tgt = attacker:GetTargetPlayer()
+  if (not IsValid(atk_tgt) or not atk_tgt:Alive() or atk_tgt:IsSpec()) and not attacker.brokeContract then return end
 
   if ply == attacker:GetTargetPlayer() then
     dmginfo:ScaleDamage(dmg_mult)
