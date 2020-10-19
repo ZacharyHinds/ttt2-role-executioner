@@ -83,6 +83,7 @@ local function ExecutionerKilledTarget(ply, _, attacker)
       net.WriteInt(punishment, 32)
       net.Send(attacker)
       timer.Simple(punishment, function()
+        if not attacker or not IsValid(attacker) or not attacker:IsPlayer() then return end
         attacker.brokeContract = nil
         NewTarget(attacker)
       end)
