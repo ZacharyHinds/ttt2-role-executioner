@@ -17,3 +17,13 @@ L["ttt2_executioner_target_died"] = "Your target died..."
 L["ttt2_executioner_target_killed_wrong"] = "You killed the wrong target! You'll get a new contract after {punishtime} seconds!"
 L["ttt2_executioner_player_target"] = "Your target! You deal {multiplier}x damage!"
 L["ttt2_executioner_player_nontarget"] = "Not your target! You deal {multiplier}x damage!"
+
+--EVENT STRINGS
+L["desc_exc_target_kill_right"] = "This kill was the executioner's target."
+L["desc_exc_target_kill_wrong"] = "This kill was not the executioner's target and broke their contract."
+L["tooltip_exc_target_kill_score"] = "Kill: {score}"
+L["exc_target_kill_score"] = "Kill:"
+L["tooltip_exc_target_kill_score_hit_right"] = "Correct target: {score}"
+L["tooltip_exc_target_kill_score_hit_wrong"] = "Wrong target: {score}"
+L["exc_target_kill_score_exc_right"] = "Correct target:"
+L["exc_target_kill_score_exc_wrong"] = "Wrong target:"

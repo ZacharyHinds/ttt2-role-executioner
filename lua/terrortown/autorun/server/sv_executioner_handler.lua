@@ -60,7 +60,7 @@ local function ExecutionerTargetDied(ply, _, attacker)
 end
 hook.Add("TTT2PostPlayerDeath", "ExecutionerTargetDied", ExecutionerTargetDied)
 
-local function ExecutionerKilledTarget(ply, _, attacker)
+local function ExecutionerKilledTarget(ply, attacker, dmgInfo)
   if not IsValid(ply) or not IsValid(attacker) then return end
   if not attacker:IsPlayer() or not attacker:Alive() then return end
 
@@ -72,10 +72,12 @@ local function ExecutionerKilledTarget(ply, _, attacker)
 
   if attacker:GetTargetPlayer() == ply then
     LANG.Msg(attacker, "ttt2_executioner_target_killed", nil, MSG_MSTACK_ROLE)
+    events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, true)
     NewTarget(attacker)
   else
     if punishment > 0 then
       LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", {punishtime = punishment}, MSG_MSTACK_ROLE)
+      events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, false)
       attacker:SetTargetPlayer(nil)
       attacker.brokeContract = true
       print("[TTT2 EXECUTIONER] " .. attacker:Nick() .. "'s Punishment Time: " .. punishment)
@@ -92,7 +94,7 @@ local function ExecutionerKilledTarget(ply, _, attacker)
     end
   end
 end
-hook.Add("TTT2PostPlayerDeath", "ExecutionerKilledTarget", ExecutionerKilledTarget)
+hook.Add("DoPlayerDeath", "ExecutionerKilledTarget", ExecutionerKilledTarget)
 
 local function ExecutionerTargetSpawned(ply)
   if GetRoundState() ~= ROUND_ACTIVE then return end
