@@ -42,12 +42,14 @@ function EXECUTIONER_DATA:AddDetectiveRole(role)
   EXECUTIONER_DATA.detectives[role] = true
 end
 
+--Setup role compatibility
 hook.Add("PostGamemodeLoaded", "TTT2ExecutionerSetupTable", function()
   --Setup exlcuded roles
   EXECUTIONER_DATA:AddExcludedRole(ROLE_JESTER)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_SWAPPER)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_MEDIC)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_DRUNK)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_MARKER)
   
   --Setup priority roles
   EXECUTIONER_DATA:AddPriorityRole(ROLE_HIDDEN)
