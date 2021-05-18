@@ -1,9 +1,69 @@
 util.AddNetworkString("ttt2_exe_broke_contract")
 
-local function GetTargets(ply)
+EXECUTIONER_DATA = EXECUTIONER_DATA or {}
+EXECUTIONER_DATA.exlude_roles = {}
+EXECUTIONER_DATA.priority_roles = {}
+EXECUTIONER_DATA.detectives = {}
+EXECUTIONER_DATA.post_detective = {}
+EXECUTIONER_DATA.pre_detective = {}
+
+--Add a excluded role. This role will both not be a target, but also will not apply the damage modifier nor punishment
+function EXECUTIONER_DATA:AddExcludedRole(role)
+  if not role then return end
+
+  EXECUTIONER_DATA.exlude_roles[role] = true
+end
+
+--Add a priority role. These will be target first, before any other role players
+function EXECUTIONER_DATA:AddPriorityRole(role)
+  if not role then return end
+
+  EXECUTIONER_DATA.priority_roles[role] = true
+end
+
+--Add a post detective role. These will be targeted after all detectives are defeated (ex. Spy)
+function EXECUTIONER_DATA:AddPostDetectiveRole(role)
+  if not role then return end
+
+  EXECUTIONER_DATA.post_detective[role] = true
+end
+
+--Add a pre detective role. These will be targeted after targets but before detectives
+function EXECUTIONER_DATA:AddPreDetectiveRole(role)
+  if not role then return end
+
+  EXECUTIONER_DATA.pre_detective[role] = true
+end
+
+--Add a detective role. These will be added to the pool of detective targets. Roles with the detective base role automatically are included here
+function EXECUTIONER_DATA:AddDetectiveRole(role)
+  if not role then return end
+
+  EXECUTIONER_DATA.detectives[role] = true
+end
+
+hook.Add("PostGamemodeLoaded", "TTT2ExecutionerSetupTable", function()
+  --Setup exlcuded roles
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_JESTER)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_SWAPPER)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_MEDIC)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_DRUNK)
+  
+  --Setup priority roles
+  EXECUTIONER_DATA:AddPriorityRole(ROLE_HIDDEN)
+
+  --Setup post detective roles
+  EXECUTIONER_DATA:AddPostDetectiveRole(ROLE_SPY)
+
+  --Setup pre detective roles
+end)
+
+function EXECUTIONER_DATA:GetTargets(ply)
   local targets = {}
   local dets = {}
-  local others = {}
+  local priority = {}
+  local post_det = {}
+  local pre_det = {}
 
   if not IsValid(ply) or not ply:IsActive() or not ply:Alive() or (ply.IsGhost and ply:IsGhost()) or ply:GetSubRole() ~= ROLE_EXECUTIONER then
     return targets
@@ -12,33 +72,41 @@ local function GetTargets(ply)
   local plys = util.GetAlivePlayers()
 
   for i = 1, #plys do
-    local pl = plys[i]
-    if pl:IsInTeam(ply) then continue end
-    if pl.IsGhost and pl:IsGhost() then continue end
-    if JESTER and pl:GetSubRole() == ROLE_JESTER then continue end
-    if MEDIC and pl:GetSubRole() == ROLE_MEDIC then continue end
-    if pl:GetBaseRole() == ROLE_DETECTIVE then
-      dets[#dets + 1] = pl
-    elseif SPY and pl:GetSubRole() == ROLE_SPY then
-      others[#others + 1] = pl
+    local tgt = plys[i]
+    if tgt.IsGhost and pl:IsGhost() then continue end
+    if tgt:GetTeam() == ply:GetTeam() then continue end
+    local tgt_role = tgt:GetSubRole()
+    if EXECUTIONER_DATA.exlude_roles[tgt_role] then continue end
+    if EXECUTIONER_DATA.priority_roles[tgt_role] then
+      priority[#priority + 1] = tgt
+    elseif EXECUTIONER_DATA.post_detective[tgt_role] then
+      post_det[#post_det + 1] = tgt
+    elseif EXECUTIONER_DATA.pre_detective[tgt_role] then
+      pre_det[#pre_det + 1] = tgt
+    elseif tgt:GetBaseRole() == ROLE_DETECTIVE or EXECUTIONER_DATA.detectives[tgt_role] then
+      dets[#dets + 1] = tgt
     else
-      targets[#targets + 1] = pl
+      targets[#targets + 1] = tgt
     end
   end
 
-  if #targets < 1 then
-    if #dets < 1 then
-      dets = others
-    end
-    targets = dets
+  if #priority > 0 then
+    return priority
+  elseif #targets > 0 then
+    return targets
+  elseif #pre_det > 0 then
+    return pre_det
+  elseif #dets > 0 then
+    return dets
+  else
+    return post_det
   end
-  return targets
 end
 
 local function NewTarget(ply)
-  local targets = GetTargets(ply)
+  local targets = EXECUTIONER_DATA:GetTargets(ply)
 
-  if #targets > 0 and not ply.brokeContract then
+  if (#targets > 0) and not ply.brokeContract then
     local target_ply = targets[math.random(#targets)]
     target_ply.huntedBy = ply:SteamID()
     ply:SetTargetPlayer(target_ply)
@@ -74,7 +142,7 @@ local function ExecutionerKilledTarget(ply, attacker, dmgInfo)
     LANG.Msg(attacker, "ttt2_executioner_target_killed", nil, MSG_MSTACK_ROLE)
     events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, true)
     NewTarget(attacker)
-  else
+  elseif not EXECUTIONER_DATA.exlude_roles[ply:GetSubRole()] then
     if punishment > 0 then
       LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", {punishtime = punishment}, MSG_MSTACK_ROLE)
       events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, false)
@@ -137,7 +205,7 @@ local function ExecutionerTargetRoleChanged(ply, old, new)
     local plys = player.GetAll()
     for i = 1, #plys do
       local pl = plys[i]
-      if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:IsInTeam(ply) then
+      if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:GetTeam() == ply then
         NewTarget(pl)
       end
     end
@@ -167,7 +235,7 @@ local function ExecutionerTargetTeamChange(ply, old, new)
   local plys = player.GetAll()
   for i = 1, #plys do
     local pl = plys[i]
-    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:IsInTeam(ply) then
+    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:GetTeam() == ply then
       NewTarget(pl)
     end
   end
@@ -206,7 +274,7 @@ local function ExecutionerDealDamage(ply, dmginfo)
 
   if ply == attacker:GetTargetPlayer() then
     dmginfo:ScaleDamage(dmg_mult)
-  elseif ply ~= attacker:GetTargetPlayer() and ply:AccountID() ~= attacker:AccountID() then
+  elseif ply:AccountID() ~= attacker:AccountID() and not EXECUTIONER_DATA.exlude_roles[ply:GetSubRole()] then
     dmginfo:ScaleDamage(dmg_div)
   end
 end
