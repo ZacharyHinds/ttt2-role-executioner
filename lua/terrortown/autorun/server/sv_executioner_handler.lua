@@ -50,6 +50,7 @@ hook.Add("PostGamemodeLoaded", "TTT2ExecutionerSetupTable", function()
   EXECUTIONER_DATA:AddExcludedRole(ROLE_MEDIC)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_DRUNK)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_MARKER)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_AMNESIAC)
   
   --Setup priority roles
   EXECUTIONER_DATA:AddPriorityRole(ROLE_HIDDEN)
@@ -75,13 +76,13 @@ function EXECUTIONER_DATA:GetTargets(ply)
 
   for i = 1, #plys do
     local tgt = plys[i]
-    if tgt.IsGhost and pl:IsGhost() then continue end
+    if tgt.IsGhost and tgt:IsGhost() then continue end
     if tgt:GetTeam() == ply:GetTeam() then continue end
     local tgt_role = tgt:GetSubRole()
     if EXECUTIONER_DATA.exlude_roles[tgt_role] then continue end
     if EXECUTIONER_DATA.priority_roles[tgt_role] then
       priority[#priority + 1] = tgt
-    elseif EXECUTIONER_DATA.post_detective[tgt_role] then
+    elseif EXECUTIONER_DATA.post_detective[tgt_role] or tgt:GetBaseRole() == ROLE_TRAITOR then
       post_det[#post_det + 1] = tgt
     elseif EXECUTIONER_DATA.pre_detective[tgt_role] then
       pre_det[#pre_det + 1] = tgt
