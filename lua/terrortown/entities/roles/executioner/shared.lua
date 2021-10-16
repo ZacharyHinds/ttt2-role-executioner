@@ -92,4 +92,36 @@ if CLIENT then
 
     target:SetClass(class)
   end)
+
+  function ROLE:AddToSettingsMenu(parent)
+    local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
+
+    form:MakeSlider({
+      serverConvar = "ttt2_executioner_punishment_time",
+      label = "label_executioner_punishment_time",
+      min = 0,
+      max = 240,
+      decimal = 0
+    })
+
+    form:MakeSlider({
+      serverConvar = "ttt2_executioner_target_multiplier",
+      label = "label_executioner_target_multiplier",
+      min = 1,
+      max = 10,
+      decimal = 1
+    })
+
+    form:MakeSlider({
+      serverConvar = "ttt2_executioner_non_target_multiplier",
+      label = "label_executioner_non_target_multiplier",
+      min = 0,
+      max = 1,
+      decimal = 1
+    })
+  end
+  
+  hook.Add("TTT2FinishedLoading", "exe_devicon", function() -- addon developer emblem for me ^_^
+    AddTTT2AddonDev("76561198049910438")
+  end)
 end

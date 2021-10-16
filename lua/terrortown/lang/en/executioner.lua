@@ -28,3 +28,8 @@ L["tooltip_exc_target_kill_score_exc_right"] = "Correct target: {score}"
 L["tooltip_exc_target_kill_score_exc_wrong"] = "Wrong target: {score}"
 L["exc_target_kill_score_exc_right"] = "Correct target:"
 L["exc_target_kill_score_exc_wrong"] = "Wrong target:"
+
+--SETTINGS STRINGS
+L["label_executioner_punishment_time"] = "Delay for new target if wrong player killed"
+L["label_executioner_target_multiplier"] = "Damage multiplier against target player"
+L["label_executioner_non_target_multiplier"] = "Damage multiplier against non-target players"

@@ -1,4 +1,7 @@
 util.AddNetworkString("ttt2_exe_broke_contract")
+CreateConVar("ttt2_executioner_punishment_time", 60, {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+CreateConVar("ttt2_executioner_target_multiplier", 2, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+CreateConVar("ttt2_executioner_non_target_multiplier", 0.5, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
 
 EXECUTIONER_DATA = EXECUTIONER_DATA or {}
 EXECUTIONER_DATA.exlude_roles = {}
@@ -51,6 +54,9 @@ hook.Add("PostGamemodeLoaded", "TTT2ExecutionerSetupTable", function()
   EXECUTIONER_DATA:AddExcludedRole(ROLE_DRUNK)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_MARKER)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_AMNESIAC)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_CLOWN)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_CURSED)
+  EXECUTIONER_DATA:AddExcludedRole(ROLE_BEGGAR)
   
   --Setup priority roles
   EXECUTIONER_DATA:AddPriorityRole(ROLE_HIDDEN)
