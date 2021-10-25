@@ -7,6 +7,9 @@ if SERVER then
   util.AddNetworkString("TTT2ExecutionerSyncClasses")
 end
 
+CreateConVar("ttt2_executioner_target_multiplier", 2, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+CreateConVar("ttt2_executioner_non_target_multiplier", 0.5, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+
 function ROLE:PreInitialize()
   self.color = Color(163, 15, 28, 255)
 

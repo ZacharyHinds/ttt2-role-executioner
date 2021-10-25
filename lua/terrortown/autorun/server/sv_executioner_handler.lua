@@ -1,7 +1,6 @@
 util.AddNetworkString("ttt2_exe_broke_contract")
 CreateConVar("ttt2_executioner_punishment_time", 60, {FCVAR_ARCHIVE, FCVAR_NOTIFY})
-CreateConVar("ttt2_executioner_target_multiplier", 2, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
-CreateConVar("ttt2_executioner_non_target_multiplier", 0.5, {FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED})
+
 
 EXECUTIONER_DATA = EXECUTIONER_DATA or {}
 EXECUTIONER_DATA.exlude_roles = {}
