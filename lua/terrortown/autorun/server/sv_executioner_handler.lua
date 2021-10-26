@@ -3,7 +3,7 @@ CreateConVar("ttt2_executioner_punishment_time", 60, {FCVAR_ARCHIVE, FCVAR_NOTIF
 
 
 EXECUTIONER_DATA = EXECUTIONER_DATA or {}
-EXECUTIONER_DATA.exlude_roles = {}
+EXECUTIONER_DATA.exclude = {}
 EXECUTIONER_DATA.priority_roles = {}
 EXECUTIONER_DATA.detectives = {}
 EXECUTIONER_DATA.post_detective = {}
@@ -13,7 +13,7 @@ EXECUTIONER_DATA.pre_detective = {}
 function EXECUTIONER_DATA:AddExcludedRole(role)
   if not role then return end
 
-  EXECUTIONER_DATA.exlude_roles[role] = true
+  EXECUTIONER_DATA.exclude[role] = true
 end
 
 --Add a priority role. These will be target first, before any other role players
@@ -45,7 +45,7 @@ function EXECUTIONER_DATA:AddDetectiveRole(role)
 end
 
 --Setup role compatibility
-hook.Add("PostGamemodeLoaded", "TTT2ExecutionerSetupTable", function()
+hook.Add("TTT2RolesLoaded", "TTT2ExecutionerSetupTable", function()
   --Setup exlcuded roles
   EXECUTIONER_DATA:AddExcludedRole(ROLE_JESTER)
   EXECUTIONER_DATA:AddExcludedRole(ROLE_SWAPPER)
@@ -84,7 +84,7 @@ function EXECUTIONER_DATA:GetTargets(ply)
     if tgt.IsGhost and tgt:IsGhost() then continue end
     if tgt:GetTeam() == ply:GetTeam() then continue end
     local tgt_role = tgt:GetSubRole()
-    if EXECUTIONER_DATA.exlude_roles[tgt_role] then continue end
+    if EXECUTIONER_DATA.exclude[tgt_role] then continue end
     if EXECUTIONER_DATA.priority_roles[tgt_role] then
       priority[#priority + 1] = tgt
     elseif EXECUTIONER_DATA.post_detective[tgt_role] or tgt:GetBaseRole() == ROLE_TRAITOR then
@@ -150,7 +150,7 @@ local function ExecutionerKilledTarget(ply, attacker, dmgInfo)
     LANG.Msg(attacker, "ttt2_executioner_target_killed", nil, MSG_MSTACK_ROLE)
     events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, true)
     NewTarget(attacker)
-  elseif not EXECUTIONER_DATA.exlude_roles[ply:GetSubRole()] then
+  elseif not EXECUTIONER_DATA.exclude[ply:GetSubRole()] then
     if punishment > 0 then
       LANG.Msg(attacker, "ttt2_executioner_target_killed_wrong", {punishtime = punishment}, MSG_MSTACK_ROLE)
       events.Trigger(EVENT_EXC_TARGET_KILL, ply, attacker, dmgInfo, false)
@@ -213,7 +213,7 @@ local function ExecutionerTargetRoleChanged(ply, old, new)
     local plys = player.GetAll()
     for i = 1, #plys do
       local pl = plys[i]
-      if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:GetTeam() == ply then
+      if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and (pl:GetTeam() == ply or EXECUTIONER_DATA.exclude[new]) then
         NewTarget(pl)
       end
     end
@@ -243,7 +243,7 @@ local function ExecutionerTargetTeamChange(ply, old, new)
   local plys = player.GetAll()
   for i = 1, #plys do
     local pl = plys[i]
-    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:GetTeam() == ply then
+    if pl:GetSubRole() == ROLE_EXECUTIONER and pl:GetTargetPlayer() == ply and pl:GetTeam() == new then
       NewTarget(pl)
     end
   end
@@ -282,7 +282,7 @@ local function ExecutionerDealDamage(ply, dmginfo)
 
   if ply == attacker:GetTargetPlayer() then
     dmginfo:ScaleDamage(dmg_mult)
-  elseif ply:AccountID() ~= attacker:AccountID() and not EXECUTIONER_DATA.exlude_roles[ply:GetSubRole()] then
+  elseif ply:AccountID() ~= attacker:AccountID() and not EXECUTIONER_DATA.exclude[ply:GetSubRole()] then
     dmginfo:ScaleDamage(dmg_div)
   end
 end
