@@ -21,6 +21,8 @@ function ROLE:PreInitialize()
   self.preventKillCredits = false
   self.preventTraitorAloneCredits = false
 
+  self.isOmniscientRole = true
+
   self.defaultEquipment = SPECIAL_EQUIPMENT -- here you can set up your own default equipment
   self.defaultTeam = TEAM_TRAITOR
 
